@@ -1,0 +1,10 @@
+.idea
+*.iml
+
+node_modules
+out
+dist
+bin
+
+behavior_packs
+resource_packs

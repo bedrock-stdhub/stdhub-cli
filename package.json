@@ -1,0 +1,32 @@
+{
+  "name": "stdhub-cli",
+  "type": "module",
+  "version": "0.1.0",
+  "description": "A CLI for bedrock-stdhub developers.",
+  "author": "Wesley F. Young",
+  "license": "GPL-3.0",
+  "private": true,
+  "scripts": {
+    "prepack": "tsc"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bedrock-stdhub/stdhub-cli.git"
+  },
+  "bin": {
+    "stdhub-cli": "bin/index.js"
+  },
+  "dependencies": {
+    "@inquirer/prompts": "^5.0.6",
+    "command-line-args": "^5.2.1"
+  },
+  "devDependencies": {
+    "@eslint/js": "^8.56.0",
+    "@types/command-line-args": "^5.2.3",
+    "@types/node": "^20.14.7",
+    "eslint": "^8.56.0",
+    "globals": "^15.6.0",
+    "typescript": "^5.5.2",
+    "typescript-eslint": "^7.13.1"
+  }
+}
