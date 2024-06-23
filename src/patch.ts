@@ -40,6 +40,7 @@ export default async function patch() {
   packageJson.version = newVersion;
   packageJson.description = newDescription;
   packageJson.dependencies['@minecraft/server'] = `^${newTargetApiVersion}`;
+  packageJson.dependencies['@minecraft/vanilla-data'] = `^${versionMapping.get(newTargetApiVersion)}`;
   fs.writeFileSync('package.json', JSON.stringify(packageJson, null, 2));
   console.log('Successfully patched `package.json`.');
 
