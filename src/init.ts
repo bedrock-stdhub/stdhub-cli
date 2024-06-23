@@ -93,6 +93,7 @@ export default async function init() {
   packageJson.description = pluginDescription;
   packageJson.version = pluginVersion;
   packageJson.dependencies['@minecraft/server'] = `^${targetApiVersion}`;
+  packageJson.dependencies['@minecraft/vanilla-data'] = `^${versionMapping.get(targetApiVersion)}`;
   fs.writeFileSync(
     'package.json',
     JSON.stringify(packageJson, null, 2)
@@ -139,5 +140,6 @@ export default async function init() {
   console.log('Successfully created `manifest.json`s.');
   console.log();
   console.log('Initialization complete.');
-  console.log('Execute `npm install` (or other package managers) and enjoy your journey!');
+  console.log('Remember to execute \x1b[44;37mnpm update @minecraft/server-net\x1b[0m to check for package updates.');
+  console.log('Execute `\x1b[32mnpm install\x1b[0m` (or other package managers) and enjoy your journey!');
 }
