@@ -5,7 +5,6 @@
   "description": "A CLI for bedrock-stdhub developers.",
   "author": "Wesley F. Young",
   "license": "GPL-3.0",
-  "private": true,
   "scripts": {
     "prepack": "tsc"
   },
