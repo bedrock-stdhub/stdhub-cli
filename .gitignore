@@ -8,3 +8,5 @@ bin
 
 behavior_packs
 resource_packs
+
+yarn.lock
