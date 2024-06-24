@@ -35,6 +35,10 @@ export default function createBoilerplate(
           'version': targetApiVersion
         },
         {
+          'module_name': '@minecraft/server-net',
+          'version': '1.0.0-beta' // Whe
+        },
+        {
           'uuid': resourcePackUUID,
           'version': pluginVersionArray
         }
