@@ -136,8 +136,17 @@ export default async function init() {
     path.resolve('resource_packs', pluginName, 'manifest.json'),
     JSON.stringify(rp_manifest, null, 2)
   );
-
   console.log('Successfully created `manifest.json`s.');
+
+  const entryFilePath = path.resolve('src', 'main.ts');
+  const entryFileLines = fs.readFileSync(entryFilePath).toString().split('\n');
+  const indexOfLineToPatch = entryFileLines.findIndex(
+    line => line.startsWith('export const pluginName')
+  );
+  entryFileLines[indexOfLineToPatch] = `export const pluginName = '${pluginName}';'`;
+  fs.writeFileSync(entryFilePath, entryFileLines.join('\n'));
+  console.log('Successfully patched `main.ts`.');
+
   console.log();
   console.log('Initialization complete.');
   console.log('Remember to execute \x1b[44;37mnpm update @minecraft/server-net\x1b[0m to check for package updates.');
