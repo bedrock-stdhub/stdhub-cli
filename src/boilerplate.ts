@@ -36,7 +36,11 @@ export default function createBoilerplate(
         },
         {
           'module_name': '@minecraft/server-net',
-          'version': '1.0.0-beta' // Whe
+          'version': '1.0.0-beta'
+        },
+        {
+          'module_name': '@minecraft/server-admin',
+          'version': '1.0.0-beta'
         },
         {
           'uuid': resourcePackUUID,
