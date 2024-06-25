@@ -138,12 +138,12 @@ export default async function init() {
   );
   console.log('Successfully created `manifest.json`s.');
 
-  const entryFilePath = path.resolve('src', 'main.ts');
+  const entryFilePath = path.resolve('scripts', 'main.ts');
   const entryFileLines = fs.readFileSync(entryFilePath).toString().split('\n');
   const indexOfLineToPatch = entryFileLines.findIndex(
     line => line.startsWith('export const pluginName')
   );
-  entryFileLines[indexOfLineToPatch] = `export const pluginName = '${pluginName}';'`;
+  entryFileLines[indexOfLineToPatch] = `export const pluginName = '${pluginName}';`;
   fs.writeFileSync(entryFilePath, entryFileLines.join('\n'));
   console.log('Successfully patched `main.ts`.');
 
