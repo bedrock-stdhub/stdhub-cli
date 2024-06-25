@@ -149,6 +149,5 @@ export default async function init() {
 
   console.log();
   console.log('Initialization complete.');
-  console.log('Remember to execute \x1b[44;37mnpm update @minecraft/server-net\x1b[0m to check for package updates.');
   console.log('Execute `\x1b[32mnpm install\x1b[0m` (or other package managers) and enjoy your journey!');
 }
