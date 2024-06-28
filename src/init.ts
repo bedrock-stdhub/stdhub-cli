@@ -46,8 +46,12 @@ export default async function init() {
   console.log('Resolving `package.json`...');
   const packageJson = JSON.parse(fs.readFileSync('package.json').toString());
 
+  const cwd = process.cwd().split(path.sep);
+  const workingDirname = cwd[cwd.length - 1];
+
   const pluginName = await input({
     message: 'The name of plugin:',
+    default: workingDirname,
   });
   const pluginDescription = await input({
     message: 'The description of plugin:',
