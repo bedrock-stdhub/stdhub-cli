@@ -1,25 +1,10 @@
-import { confirm, input } from '@inquirer/prompts';
+import { confirm, input, select } from '@inquirer/prompts';
 import { randomUUID } from 'crypto';
 import * as fs from 'node:fs';
+import * as fsExtra from 'fs-extra';
 import * as path from 'node:path';
 import createBoilerplate from './boilerplate.js';
-
-export const versionRegex = /^\d+\.\d+\.\d+$/;
-export const latestApiRelease = '1.11.0'; // latest till 2024/6/23
-export const versionMapping = new Map<string, string>([
-  [ '1.0.0', '1.19.70' ],
-  [ '1.1.0', '1.19.80' ],
-  [ '1.2.0', '1.20.0'  ],
-  [ '1.3.0', '1.20.10' ],
-  [ '1.4.0', '1.20.20' ],
-  [ '1.5.0', '1.20.30' ],
-  [ '1.6.0', '1.20.40' ],
-  [ '1.7.0', '1.20.50' ],
-  [ '1.8.0', '1.20.60' ],
-  [ '1.9.0', '1.20.70' ],
-  [ '1.10.0', '1.20.80' ],
-  [ '1.11.0', '1.21.0' ],
-]);
+import { versionRegex, versions } from './index.js';
 
 export default async function init() {
   const behaviorPackUUID = randomUUID();
@@ -72,13 +57,15 @@ export default async function init() {
     default: '0.1.0',
     validate: input => versionRegex.test(input),
   });
-  const targetApiVersion = await input({
-    message: 'Version of @minecraft/server:',
-    default: latestApiRelease,
-    validate: input => versionRegex.test(input) && (typeof versionMapping.get(input) === 'string'),
+  const targetApiVersion = await select({
+    message: 'Target API version:',
+    choices: versions.map(value => ({
+      value,
+      name: value.mcDependencyVersion,
+      description: `compatible with Minecraft ${value.releaseVersion}`,
+    })),
+    default: versions[0],
   });
-  const minEngineVersion = versionMapping.get(targetApiVersion)!;
-
   console.log({ pluginName, pluginDescription, pluginVersion, targetApiVersion });
   const ok = await confirm({
     message: 'Is that OK?',
@@ -92,8 +79,8 @@ export default async function init() {
   packageJson.productName = pluginName;
   packageJson.description = pluginDescription;
   packageJson.version = pluginVersion;
-  packageJson.dependencies['@minecraft/server'] = `^${targetApiVersion}`;
-  packageJson.dependencies['@minecraft/vanilla-data'] = `^${versionMapping.get(targetApiVersion)}`;
+  packageJson.dependencies['@minecraft/server'] = `${targetApiVersion.original}-stable`;
+  packageJson.dependencies['@minecraft/vanilla-data'] = targetApiVersion.releaseVersion;
   fs.writeFileSync(
     'package.json',
     JSON.stringify(packageJson, null, 2)
@@ -110,13 +97,13 @@ export default async function init() {
   console.log('Successfully patched `.env`.');
 
   const pluginVersionArray = pluginVersion.split('.').map(v => parseInt(v));
-  const minEngineVersionArray = minEngineVersion.split('.').map(v => parseInt(v));
+  const minEngineVersionArray = targetApiVersion.releaseVersion.split('.').map(v => parseInt(v));
 
   const { bp_manifest, rp_manifest } = createBoilerplate(
     pluginName,
     pluginDescription,
     pluginVersionArray,
-    targetApiVersion,
+    `${targetApiVersion.apiVersion}-beta`,
     minEngineVersionArray,
     behaviorPackUUID,
     scriptResourceUUID,
@@ -124,16 +111,16 @@ export default async function init() {
     resourceModuleUUID
   );
 
-  fs.mkdirSync('behavior_packs');
-  fs.mkdirSync(path.resolve('behavior_packs', pluginName));
+  const bpDirectory = path.resolve('behavior_packs', pluginName);
+  fsExtra.ensureDirSync(bpDirectory);
   fs.writeFileSync(
-    path.resolve('behavior_packs', pluginName, 'manifest.json'),
+    path.join(bpDirectory, 'manifest.json'),
     JSON.stringify(bp_manifest, null, 2)
   );
-  fs.mkdirSync('resource_packs');
-  fs.mkdirSync(path.resolve('resource_packs', pluginName));
+  const rpDirectory = path.resolve('resource_packs', pluginName);
+  fsExtra.ensureDirSync(rpDirectory);
   fs.writeFileSync(
-    path.resolve('resource_packs', pluginName, 'manifest.json'),
+    path.join(rpDirectory, 'manifest.json'),
     JSON.stringify(rp_manifest, null, 2)
   );
   console.log('Successfully created `manifest.json`s.');

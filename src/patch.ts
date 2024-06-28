@@ -1,7 +1,7 @@
-import { confirm, input } from '@inquirer/prompts';
-import { versionMapping, versionRegex } from './init.js';
+import { confirm, input, select } from '@inquirer/prompts';
 import fs from 'node:fs';
 import path from 'node:path';
+import { versionRegex, versions } from './index.js';
 
 export default async function patch() {
   console.log('Reading plugin name and version from `package.json`...');
@@ -16,17 +16,21 @@ export default async function patch() {
     default: packageJson.version,
     validate: input => versionRegex.test(input),
   });
-  const newTargetApiVersion = await input({
-    message: 'New target API version:',
-    default: packageJson.dependencies['@minecraft/server'].substring(1),
-    validate: input => versionRegex.test(input) && (typeof versionMapping.get(input) === 'string'),
+  const newTargetApiVersion = await select({
+    message: 'Target API version:',
+    choices: versions.map(value => ({
+      value,
+      name: value.mcDependencyVersion,
+      description: `compatible with Minecraft ${value.releaseVersion}`,
+    })),
+    default: versions[0],
   });
   const newDescription = await input({
     message: 'New description:',
     default: packageJson.description,
   });
   const newVersionArray = newVersion.split('.').map(v => parseInt(v));
-  const newTargetApiVersionArray = versionMapping.get(newTargetApiVersion)!.split('.').map(v => parseInt(v));
+  const newMinEngineVersionArray = newTargetApiVersion.releaseVersion.split('.').map(v => parseInt(v));
 
   console.log({ newVersion, newTargetApiVersion, newDescription });
   const ok = await confirm({
@@ -39,20 +43,21 @@ export default async function patch() {
 
   packageJson.version = newVersion;
   packageJson.description = newDescription;
-  packageJson.dependencies['@minecraft/server'] = `^${newTargetApiVersion}`;
-  packageJson.dependencies['@minecraft/vanilla-data'] = `^${versionMapping.get(newTargetApiVersion)}`;
+  packageJson.dependencies['@minecraft/server'] = `${newTargetApiVersion.original}-stable`;
+  packageJson.dependencies['@minecraft/vanilla-data'] = newTargetApiVersion.releaseVersion;
   fs.writeFileSync('package.json', JSON.stringify(packageJson, null, 2));
   console.log('Successfully patched `package.json`.');
 
   bpManifest.header.description = newDescription;
-  bpManifest.header.min_engine_version = newTargetApiVersionArray;
+  bpManifest.header.min_engine_version = newMinEngineVersionArray;
   bpManifest.header.version = newVersionArray;
   bpManifest.modules[0].version = newVersionArray;
+  bpManifest.dependencies[1].version = `${newTargetApiVersion.apiVersion}-beta`;
   bpManifest.dependencies[1].version = newVersionArray;
   fs.writeFileSync(bpManifestLocation, JSON.stringify(bpManifest, null, 2));
 
   rpManifest.header.description = newDescription;
-  rpManifest.header.min_engine_version = newTargetApiVersionArray;
+  rpManifest.header.min_engine_version = newMinEngineVersionArray;
   rpManifest.header.version = newVersionArray;
   rpManifest.modules[0].version = newVersionArray;
   rpManifest.dependencies[0].version = newVersionArray;
