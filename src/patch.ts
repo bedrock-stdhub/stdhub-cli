@@ -20,7 +20,7 @@ export default async function patch() {
     message: 'Target API version:',
     choices: versions.map(value => ({
       value,
-      name: value.mcDependencyVersion,
+      name: value.original,
       description: `compatible with Minecraft ${value.releaseVersion}`,
     })),
     default: versions[0],
@@ -43,7 +43,7 @@ export default async function patch() {
 
   packageJson.version = newVersion;
   packageJson.description = newDescription;
-  packageJson.dependencies['@minecraft/server'] = `${newTargetApiVersion.original}-stable`;
+  packageJson.dependencies['@minecraft/server'] = newTargetApiVersion;
   packageJson.dependencies['@minecraft/vanilla-data'] = newTargetApiVersion.releaseVersion;
   fs.writeFileSync('package.json', JSON.stringify(packageJson, null, 2));
   console.log('Successfully patched `package.json`.');

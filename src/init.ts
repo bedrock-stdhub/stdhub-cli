@@ -61,7 +61,7 @@ export default async function init() {
     message: 'Target API version:',
     choices: versions.map(value => ({
       value,
-      name: value.mcDependencyVersion,
+      name: value.original,
       description: `compatible with Minecraft ${value.releaseVersion}`,
     })),
     default: versions[0],
@@ -79,7 +79,7 @@ export default async function init() {
   packageJson.productName = pluginName;
   packageJson.description = pluginDescription;
   packageJson.version = pluginVersion;
-  packageJson.dependencies['@minecraft/server'] = `${targetApiVersion.original}-stable`;
+  packageJson.dependencies['@minecraft/server'] = targetApiVersion.original;
   packageJson.dependencies['@minecraft/vanilla-data'] = targetApiVersion.releaseVersion;
   fs.writeFileSync(
     'package.json',

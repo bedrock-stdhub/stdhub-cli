@@ -20,13 +20,12 @@ export async function fetchVersions(packageName: string) {
  */
 export async function getMinecraftServerApiVersionPrefixes() {
   const rawVersionList = await fetchVersions('@minecraft/server');
-  const filtered = rawVersionList
+  return rawVersionList
     .filter(version => versionExp.test(version))
-    .map(matchedVersion => matchedVersion.match(versionExp)![1]);
-  const reduced = new Set(filtered);
-  return (<string[]>Array.from(reduced).reverse()).map(mcDependencyVersion => {
-    const original = filtered.findLast(value => value.startsWith(mcDependencyVersion))!;
-    const [ , apiVersion, releaseVersion ] = mcDependencyVersion.match(reducedVersionExp)!;
-    return { original, mcDependencyVersion, apiVersion, releaseVersion };
-  });
+    .map(original => {
+      const reducedVersion = original.match(versionExp)![1];
+      const [ , apiVersion, releaseVersion ] = reducedVersion.match(reducedVersionExp)!;
+      return { original, apiVersion, releaseVersion };
+    })
+    .reverse();
 }
