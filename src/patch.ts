@@ -43,7 +43,7 @@ export default async function patch() {
 
   packageJson.version = newVersion;
   packageJson.description = newDescription;
-  packageJson.dependencies['@minecraft/server'] = newTargetApiVersion;
+  packageJson.dependencies['@minecraft/server'] = newTargetApiVersion.original;
   packageJson.dependencies['@minecraft/vanilla-data'] = newTargetApiVersion.releaseVersion;
   fs.writeFileSync('package.json', JSON.stringify(packageJson, null, 2));
   console.log('Successfully patched `package.json`.');
@@ -52,8 +52,7 @@ export default async function patch() {
   bpManifest.header.min_engine_version = newMinEngineVersionArray;
   bpManifest.header.version = newVersionArray;
   bpManifest.modules[0].version = newVersionArray;
-  bpManifest.dependencies[1].version = `${newTargetApiVersion.apiVersion}-beta`;
-  bpManifest.dependencies[1].version = newVersionArray;
+  bpManifest.dependencies[0].version = `${newTargetApiVersion.apiVersion}-beta`;
   fs.writeFileSync(bpManifestLocation, JSON.stringify(bpManifest, null, 2));
 
   rpManifest.header.description = newDescription;
