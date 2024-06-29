@@ -4,7 +4,7 @@ import * as fs from 'node:fs';
 import * as fsExtra from 'fs-extra';
 import * as path from 'node:path';
 import createBoilerplate from './boilerplate.js';
-import { versionRegex, versions } from './index.js';
+import { stdhubApiVersions, versionRegex, versions } from './index.js';
 
 export default async function init() {
   const behaviorPackUUID = randomUUID();
@@ -70,7 +70,12 @@ export default async function init() {
     })),
     default: versions[0],
   });
-  console.log({ pluginName, pluginDescription, pluginVersion, targetApiVersion });
+  const stdhubApiVersion = await select({
+    message: 'stdhub-plugin-api version:',
+    choices: stdhubApiVersions.map(value => ({ value })),
+    default: stdhubApiVersions[0],
+  });
+  console.log({ pluginName, pluginDescription, pluginVersion, targetApiVersion, stdhubApiVersion });
   const ok = await confirm({
     message: 'Is that OK?',
   });
@@ -85,6 +90,7 @@ export default async function init() {
   packageJson.version = pluginVersion;
   packageJson.dependencies['@minecraft/server'] = targetApiVersion.original;
   packageJson.dependencies['@minecraft/vanilla-data'] = targetApiVersion.releaseVersion;
+  packageJson.dependencies['stdhub-plugin-api'] = `^${stdhubApiVersion}`;
   fs.writeFileSync(
     'package.json',
     JSON.stringify(packageJson, null, 2)

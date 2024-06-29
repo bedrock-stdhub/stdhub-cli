@@ -1,7 +1,7 @@
 import { confirm, input, select } from '@inquirer/prompts';
 import fs from 'node:fs';
 import path from 'node:path';
-import { versionRegex, versions } from './index.js';
+import { stdhubApiVersions, versionRegex, versions } from './index.js';
 
 export default async function patch() {
   console.log('Reading plugin name and version from `package.json`...');
@@ -25,6 +25,11 @@ export default async function patch() {
     })),
     default: versions[0],
   });
+  const newStdhubApiVersion = await select({
+    message: 'stdhub-plugin-api version:',
+    choices: stdhubApiVersions.map(value => ({ value })),
+    default: stdhubApiVersions[0],
+  });
   const newDescription = await input({
     message: 'New description:',
     default: packageJson.description,
@@ -32,7 +37,7 @@ export default async function patch() {
   const newVersionArray = newVersion.split('.').map(v => parseInt(v));
   const newMinEngineVersionArray = newTargetApiVersion.releaseVersion.split('.').map(v => parseInt(v));
 
-  console.log({ newVersion, newTargetApiVersion, newDescription });
+  console.log({ newVersion, newTargetApiVersion, newStdhubApiVersion, newDescription });
   const ok = await confirm({
     message: 'Is that OK?',
   });
@@ -45,6 +50,7 @@ export default async function patch() {
   packageJson.description = newDescription;
   packageJson.dependencies['@minecraft/server'] = newTargetApiVersion.original;
   packageJson.dependencies['@minecraft/vanilla-data'] = newTargetApiVersion.releaseVersion;
+  packageJson.dependencies['stdhub-plugin-api'] = `^${newStdhubApiVersion}`;
   fs.writeFileSync('package.json', JSON.stringify(packageJson, null, 2));
   console.log('Successfully patched `package.json`.');
 
