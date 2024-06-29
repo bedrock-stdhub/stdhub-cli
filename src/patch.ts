@@ -53,6 +53,7 @@ export default async function patch() {
   bpManifest.header.version = newVersionArray;
   bpManifest.modules[0].version = newVersionArray;
   bpManifest.dependencies[0].version = `${newTargetApiVersion.apiVersion}-beta`;
+  bpManifest.dependencies[bpManifest.dependencies.length - 1].version = newVersionArray;
   fs.writeFileSync(bpManifestLocation, JSON.stringify(bpManifest, null, 2));
 
   rpManifest.header.description = newDescription;
