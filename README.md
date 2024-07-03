@@ -1,3 +1,7 @@
+# Deprecated because of the new plugin build system.
+
+---
+
 # stdhub-cli
 
 Command line interface for [bedrock-stdhub](https://github.com/bedrock-stdhub/bedrock-stdhub) developers.
